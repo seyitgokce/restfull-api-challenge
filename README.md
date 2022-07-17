@@ -9,20 +9,16 @@ Support HTTP and HTTPS
 # Create folder to store all your docker compose projects
 mkdir docker-projects  
 
-cd docker-projects  
+cd docker-projects
 
-git clone https://github.com/phoenixlam/docker-lemp-symfony5.git  
+git clone https://github.com/seyitgokce/restfull-api-challenge  
 
-cd docker-lemp-symfony5  
+cd restfull-api-challenge
 
 cd docker  
 
 # Optional, update environment variables for MySQL connection and Symfony
 vi .env
-
-# Optional, update init.sql if you updated DATABASE_NAME in .env
-# init.sql will create a "testdb" with a "testtable" and insert some rows for testing CRUD operations
-vi database/init.sql
 
 # Optional, update port mapping
 # Default
@@ -38,40 +34,11 @@ vi docker-compose.yml
 #   nginx/ssl/nginx-selfsigned.key
 
 # Start the containers
-docker-compose up
-
-# Verify
-# you may modify the test cases in web-skeleton/src/Controller/TestController.php
-#   http://127.0.0.1/test/json
-#   https://127.0.0.1/test/html
-#   http://127.0.0.1/test/log
-#   http://127.0.0.1/test/mysql/insert
-#   http://127.0.0.1/test/mysql/select-one
-#   http://127.0.0.1/test/mysql/select-many
-#   http://127.0.0.1/test/mysql/update
-#   http://127.0.0.1/test/mysql/delete
-
-# Setup logrotate
-vi /etc/logrotate.d/docker
-
-# Below is a example of logrotate config file
-/var/lib/docker/containers/*/*.log
-/path-to-your-docker-folders/docker-lemp-symfony5/web-skeleton/var/log/*.log
-/path-to-your-docker-folders/docker-lemp-symfony5/docker/logs/nginx/*.log {
-    daily
-    rotate 7
-    copytruncate
-    missingok
-    dateext dateformat -%Y-%m-%d
-
-    # because the symfony log is unknown user
-    su root root
-}
-```
+docker-compose up 
 
 ## Version of the images
 Linux  
 Nginx 1.18  
 Mariadb 10.4  
 PHP 7.4    
-Symfony 5.1
+Symfony 5.4

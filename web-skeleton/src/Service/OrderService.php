@@ -11,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
+use OrderUpdateDTO;
 
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -33,13 +34,11 @@ class OrderService
     /**
      * OrderService constructor.
      * @param EntityManagerInterface $entityManager
-     * @param ManagerRegistry $doctrine
      * @param ProductService $productService
      */
-    public function __construct(EntityManagerInterface $entityManager, ManagerRegistry $doctrine, ProductService $productService)
+    public function __construct(EntityManagerInterface $entityManager, ProductService $productService)
     {
         $this->entityManager = $entityManager;
-        $this->doctrine = $doctrine;
         $this->productService = $productService;
     }
 
@@ -48,20 +47,20 @@ class OrderService
      */
     public function allOrders()
     {
-        return $this->doctrine->getManager()->getRepository(Order::class)->findAll();
+        return $this->entityManager->getRepository(Order::class)->findAll();
     }
 
     /**
-     * @param \Symfony\Component\Security\Core\User\UserInterface|null $user
+     * @param UserInterface|null $user
      * @return mixed
      */
-    public function getMyOrders(UserInterface $user)
+    public function getOrdersByUser(UserInterface $user)
     {
-        return $this->doctrine->getManager()->getRepository(Order::class)->findByUser($user);
+        return $this->entityManager->getRepository(Order::class)->findByUser($user);
     }
 
     /**
-     * @param User $user
+     * @param UserInterface $user
      * @param Product $product
      * @param int $quantity
      * @param $shipping_address
@@ -93,8 +92,6 @@ class OrderService
 
         }
         throw new Exception("You can't order more of the product stock");
-
-
     }
 
 
@@ -104,54 +101,62 @@ class OrderService
      */
     public function orderDetail($id)
     {
-        return $this->doctrine->getManager()->getRepository(Order::class)->find($id);
+        return $this->entityManager->getRepository(Order::class)->find($id);
     }
 
     /**
-     * @param $order
-     * @param $updateData
-     * @return Order
+     * @param Order $order
+     * @param $product_id
+     * @param $quantity
+     * @param $shipping_address
+     * @return OrderUpdateDTO
      * @throws Exception
      */
-    public function orderUpdate(Order $order, $updateData)
+    public function orderUpdate(Order $order, $product_id, $quantity, $shipping_address)
     {
 
-        $product_id = ($updateData->product_id > 0) ? $updateData->product_id : $order->getProduct()->getId();
+        $updateData = new OrderUpdateDTO();
+        $updateData->setProductId($product_id);
+        $updateData->setQuantity($quantity);
+        $updateData->setShippingAddress($shipping_address);
+
+
+        $product_id = ($updateData->getProductId() > 0) ? $updateData->getProductId() : $order->getProduct()->getId();
 
         $product = $this->productService->getProduct($product_id);
 
         // Stock status check
-        if ($updateData->quantity > $product->getQuantity()) {
+        if ($updateData->getQuantity() > $product->getQuantity()) {
             throw new Exception("You can't order more of the product stock");
         }
 
 
         // [optional] Product update
         // Product control
-        if ($updateData->product_id > 0) {
+        if ($updateData->getProductId() > 0) {
 
             // [optional]Quantity update
-            if ($updateData->quantity) {
-                $order->setQuantity($updateData->quantity);
+            if ($updateData->getQuantity()) {
+                $order->setQuantity($updateData->getQuantity());
             }
 
             $order->setProduct($product);
             $order->setPrice($order->getQuantity() * $product->getPrice());
         }
 
-        if ($updateData->quantity) {
-            $order->setPrice($updateData->quantity * $order->getPrice());
-            $order->setQuantity($updateData->quantity);
+        if ($updateData->getQuantity()) {
+            $order->setPrice($updateData->getQuantity() * $order->getPrice());
+            $order->setQuantity($updateData->getQuantity());
         }
 
         // Shipping address update
-        if ($updateData->shipping_address) {
-            $order->setShippingAddress($updateData->shipping_address);
+        if ($updateData->getShippingAddress()) {
+            $order->setShippingAddress($updateData->getShippingAddress());
         }
 
         $this->entityManager->flush();
 
-        return $order;
+        return $updateData;
     }
 
 

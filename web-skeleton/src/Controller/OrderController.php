@@ -94,15 +94,9 @@ class OrderController extends AbstractController
         $quantity = (int)$request->get('quantity');
         $shipping_address = $request->get('shipping_address');
 
-        $updateData = new \stdClass();
-        $updateData->product_id = $product_id;
-        $updateData->quantity = $quantity;
-        $updateData->shipping_address = $shipping_address;
+        $updateData = $this->orderService->orderUpdate($order, $product_id, $quantity, $shipping_address);
 
-
-        $order = $this->orderService->orderUpdate($order, $updateData);
-
-        return new JsonResponse($order);
+        return new JsonResponse($updateData);
     }
 
     /**
@@ -122,13 +116,7 @@ class OrderController extends AbstractController
     {
         $user = $this->getUser();
 
-        $orders = [];
-        foreach ($this->orderService->getMyOrders($user) as $myOrder)
-        {
-            $orders[] = $myOrder;
-        }
-
-        return new JsonResponse($orders);
+        return new JsonResponse($this->orderService->getOrdersByUser($user));
     }
 
 
