@@ -187,17 +187,6 @@ class Order implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
-            "id" => $this->getId(),
-            "orderCode"    => $this->getOrderCode(),
-            "quantity" => $this->getQuantity(),
-            "address"   => $this->getAddress(),
-            "shippingDate"  => $this->getShippingDate(),
-            "product"   => $this->getProduct(),
-            "user"  => $this->getUser(),
-            "price" => $this->getPrice(),
-            "orderDate" => $this->getOrderDate(),
-            "shippingAddress" => $this->getShippingAddress()
-        ];
+        return get_object_vars($this);
     }
 }

@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -82,7 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -176,7 +176,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \JsonSe
     {
         return [
             "id" => $this->getId(),
-            "email"    => $this->getEmail()
+            "email" => $this->getEmail()
         ];
     }
 }
+

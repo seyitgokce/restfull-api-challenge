@@ -65,7 +65,7 @@ class OrderController extends AbstractController
         $order = $this->orderService->newOrder($user, $product, rand(1, 50), $shipping_address);
 
 
-        return new JsonResponse(['success' => 'Order successfully created', 'order_code' => $order->getOrderCode()], Response::HTTP_CREATED);
+        return new JsonResponse(['success' => 'Order successfully created', 'order' => $order], Response::HTTP_CREATED);
     }
 
     /**
